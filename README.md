@@ -26,6 +26,7 @@
 Sau khi cài đặt, dashboard sẽ được thiết lập như sau:
 VWRT Dashboard (Mặc định):
 Truy cập thẳng vào địa chỉ IP của router để xem dashboard mới.
+
 [router-ip/vwrt](http://${location.hostname}/vwrt)
 ---
 
