@@ -1,122 +1,89 @@
 #!/bin/sh
 
-# Hàm xuất JSON và thoát khỏi script
-json_exit() {
-    local status="$1"
-    local msg="$2"
-    local extra="$3"
-    
-    if [ -n "$extra" ]; then
-        echo "{\"status\":\"$status\",\"msg\":\"$msg\",$extra}"
-    else
-        echo "{\"status\":\"$status\",\"msg\":\"$msg\"}"
-    fi
-    exit 0
-}
-
-# In header JSON trước
-echo "Content-Type: application/json"
-echo ""
+# Dừng script ngay lập tức nếu có bất kỳ lệnh nào thất bại
+set -e
 
 # --- Cấu hình ---
-REPO_NAME="vwrt-dashboard"
-BRANCH="main" # Nhánh chính của repo
-REPO="vietter99/$REPO_NAME"
-DEST="/www/vwrt"
-ZIP_URL="https://github.com/$REPO/archive/refs/heads/$BRANCH.zip"
-VERSION_URL="https://raw.githubusercontent.com/$REPO/$BRANCH/VERSION"
+REPO_URL="https://github.com/vietter99/vwrt-dashboard/archive/refs/heads/main.zip"
+DEST_DIR="/www/vwrt"
+UHTTPD_CONF="/etc/config/uhttpd"
+
+# Các thư mục và file tạm
 OUT_ZIP="/tmp/dashboard.zip"
 WORKDIR="/tmp/dashboard_update"
+EXTRACTED_DIR_NAME="vwrt-dashboard-main" # Tên thư mục sau khi giải nén từ zip của GitHub
 
-# --- Bước 1: Kiểm tra và cài đặt các gói phụ thuộc ---
-PACKAGES_NEEDED="curl unzip"
-for pkg in $PACKAGES_NEEDED; do
-    if ! opkg list-installed | grep -q "^$pkg "; then
-        opkg update >/dev/null 2>&1
-        opkg install $pkg >/dev/null 2>&1
-        if ! opkg list-installed | grep -q "^$pkg "; then
-            json_exit "error" "Không thể cài đặt gói phụ thuộc: $pkg"
-        fi
-    fi
-done
+# --- Bắt đầu ---
 
-# --- Bước 2: So sánh phiên bản ---
-LOCAL_VER=$(cat "$DEST/VERSION" 2>/dev/null || echo "0.0.0")
-LATEST_VER=$(curl -s -f "$VERSION_URL" 2>/dev/null)
+# 1. Cài đặt các gói phụ thuộc
+echo "=> Đang cài đặt các gói cần thiết (curl, unzip)..."
+opkg update
+opkg install curl unzip
 
-if [ -z "$LATEST_VER" ]; then
-    json_exit "error" "Không thể lấy thông tin phiên bản mới nhất từ GitHub."
-fi
-
-if [ "$LOCAL_VER" = "$LATEST_VER" ]; then
-    json_exit "skip" "Bạn đang ở phiên bản mới nhất!" "\"version\":\"$LOCAL_VER\""
-fi
-
-# --- Bước 3: Tải và kiểm tra file ---
+# 2. Tải về phiên bản mới nhất
+echo "=> Đang tải phiên bản mới nhất từ GitHub..."
+# Dọn dẹp file tạm cũ
 rm -rf "$OUT_ZIP" "$WORKDIR"
 mkdir -p "$WORKDIR"
 
-curl -s -L -o "$OUT_ZIP" "$ZIP_URL"
-if [ $? -ne 0 ]; then
-    json_exit "error" "Tải file cập nhật thất bại."
-fi
+# Tải file zip
+curl -sL "$REPO_URL" -o "$OUT_ZIP"
 
-if ! unzip -tq "$OUT_ZIP" >/dev/null 2>&1; then
-    rm -f "$OUT_ZIP"
-    json_exit "error" "File tải về không phải là file zip hợp lệ."
-fi
+# Kiểm tra file zip
+echo "=> Đang kiểm tra file đã tải về..."
+unzip -tq "$OUT_ZIP"
 
-# --- Bước 4: Cập nhật an toàn (Giải nén và di chuyển) ---
+# 3. Cài đặt an toàn
+echo "=> Đang giải nén phiên bản mới..."
 unzip -q "$OUT_ZIP" -d "$WORKDIR"
-EXTRACTED_DIR="$WORKDIR/$REPO_NAME-$BRANCH"
 
-if [ ! -d "$EXTRACTED_DIR" ]; then
-    rm -rf "$OUT_ZIP" "$WORKDIR"
-    json_exit "error" "Lỗi giải nén: không tìm thấy thư mục dự án."
+# Di chuyển phiên bản cũ (nếu có) để sao lưu
+if [ -d "$DEST_DIR" ]; then
+    echo "=> Đang sao lưu phiên bản cũ..."
+    mv "$DEST_DIR" "$DEST_DIR.bak"
 fi
 
-if [ -d "$DEST" ]; then
-    mv "$DEST" "$DEST.bak"
+# Di chuyển phiên bản mới vào vị trí
+echo "=> Đang cài đặt phiên bản mới..."
+mv "$WORKDIR/$EXTRACTED_DIR_NAME" "$DEST_DIR"
+
+# Cấp quyền thực thi
+if [ -d "$DEST_DIR/cgi-bin" ]; then
+    chmod -R 755 "$DEST_DIR/cgi-bin"
 fi
 
-mv "$EXTRACTED_DIR" "$DEST"
-
-if [ -d "$DEST" ]; then
-    rm -rf "$DEST.bak"
-else
-    if [ -d "$DEST.bak" ]; then
-        mv "$DEST.bak" "$DEST"
-    fi
-    json_exit "error" "Không thể di chuyển phiên bản mới vào vị trí."
+# 4. Cấu hình Web Server
+echo "=> Đang cấu hình web server (uhttpd)..."
+# Sao lưu file config gốc một lần
+if [ ! -f "$UHTTPD_CONF.bak-vwrt" ]; then
+    cp "$UHTTPD_CONF" "$UHTTPD_CONF.bak-vwrt"
 fi
 
-# --- Bước 5: Cấu hình và dọn dẹp ---
-if [ -d "$DEST/cgi-bin" ]; then
-    chmod -R 755 "$DEST/cgi-bin"
-fi
+# Vô hiệu hóa trang index cũ
+sed -i "s/.*list index_page 'index.html'.*/#&/" "$UHTTPD_CONF"
 
-rm -f "$OUT_ZIP"
-rm -rf "$WORKDIR"
-
-UHTTPD_CONF="/etc/config/uhttpd"
-CONFIG_CHANGED=0
-
+# Thêm cấu hình mới nếu chưa có
 if ! grep -q "list index_page 'vwrt/index.html'" "$UHTTPD_CONF"; then
-    CONFIG_CHANGED=1
-    sed -i "s/.*list index_page 'index.html'.*/#&/" "$UHTTPD_CONF"
     sed -i "/config uhttpd 'main'/a\\
 	list index_page 'vwrt/index.html'" "$UHTTPD_CONF"
 fi
 
 if ! grep -q "list interpreter '.lua=/usr/bin/lua'" "$UHTTPD_CONF"; then
-    CONFIG_CHANGED=1
     sed -i "/config uhttpd 'main'/a\\
 	list interpreter '.lua=/usr/bin/lua'" "$UHTTPD_CONF"
 fi
 
-if [ "$CONFIG_CHANGED" -eq 1 ]; then
-    /etc/init.d/uhttpd restart
-fi
+# 5. Hoàn tất
+echo "=> Đang khởi động lại web server..."
+/etc/init.d/uhttpd restart
 
-# --- Bước 6: Trả kết quả thành công ---
-json_exit "ok" "Cập nhật thành công!" "\"old_ver\":\"$LOCAL_VER\",\"new_ver\":\"$LATEST_VER\""
+# Dọn dẹp file sao lưu và file tạm
+echo "=> Đang dọn dẹp..."
+rm -rf "$DEST_DIR.bak"
+rm -f "$OUT_ZIP"
+rm -rf "$WORKDIR"
+
+echo "✅ HOÀN TẤT! VWRT Dashboard đã được cài đặt thành công."
+echo "   Hãy truy cập địa chỉ IP của router để xem."
+
+exit 0
