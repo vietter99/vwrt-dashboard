@@ -5,7 +5,7 @@ DEST_DIR="/www/vwrt"
 UHTTPD_CONF="/etc/config/uhttpd"
 
 opkg update
-opkg install git-http wget
+opkg install git wget
 
 if ! command -v git > /dev/null; then
     exit 1
