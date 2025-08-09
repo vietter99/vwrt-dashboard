@@ -2,7 +2,8 @@
 
 > Một dashboard giao diện hiện đại, gọn gàng và thời gian thực để theo dõi toàn bộ thông tin quan trọng trên router OpenWrt của bạn.
 
-![VWRT Dashboard Screenshot](<img width="826" height="913" alt="image" src="https://github.com/user-attachments/assets/d1ad3cfb-e225-454c-ab02-7b99239927c4" />)
+![VWRT Dashboard Screenshot]<img width="826" height="913" alt="image" src="https://github.com/user-attachments/assets/f9ed6ad7-f650-42c9-bec2-0b216067f624" />
+
 
 ---
 
@@ -30,7 +31,7 @@ Chỉ cần kết nối vào router của bạn qua SSH và chạy một dòng l
 
 ```sh
 wget -O setup.sh [https://raw.githubusercontent.com/vietter99/vwrt-dashboard/main/setup_dashboard.sh](https://raw.githubusercontent.com/vietter99/vwrt-dashboard/main/setup_dashboard.sh) && chmod +x setup.sh && ./setup.sh
-
+```sh
 🔑 Truy cập
 Sau khi cài đặt, dashboard sẽ được thiết lập như sau:
 
