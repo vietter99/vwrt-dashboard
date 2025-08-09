@@ -11,40 +11,41 @@ UHTTPD_CONF="/etc/config/uhttpd"
 # Các thư mục và file tạm
 OUT_ZIP="/tmp/dashboard.zip"
 WORKDIR="/tmp/dashboard_update"
-EXTRACTED_DIR_NAME="vwrt-dashboard-main" # Tên thư mục sau khi giải nén từ zip của GitHub
+# Tên thư mục sau khi giải nén từ zip của GitHub sẽ là ten-repo-ten-nhanh
+EXTRACTED_DIR_NAME="vwrt-dashboard-main" 
 
 # --- Bắt đầu ---
 
 # 1. Cài đặt các gói phụ thuộc
-echo "=> Đang cài đặt các gói cần thiết (curl, unzip)..."
+echo "=> Dang cai dat cac goi can thiet (wget, unzip)..."
 opkg update
-opkg install curl unzip
+opkg install wget unzip
 
 # 2. Tải về phiên bản mới nhất
-echo "=> Đang tải phiên bản mới nhất từ GitHub..."
+echo "=> Dang tai phien ban moi nhat tu GitHub..."
 # Dọn dẹp file tạm cũ
 rm -rf "$OUT_ZIP" "$WORKDIR"
 mkdir -p "$WORKDIR"
 
 # Tải file zip
-curl -sL "$REPO_URL" -o "$OUT_ZIP"
+wget -O "$OUT_ZIP" "$REPO_URL"
 
 # Kiểm tra file zip
-echo "=> Đang kiểm tra file đã tải về..."
+echo "=> Dang kiem tra file da tai ve..."
 unzip -tq "$OUT_ZIP"
 
 # 3. Cài đặt an toàn
-echo "=> Đang giải nén phiên bản mới..."
+echo "=> Dang giai nen phien ban moi..."
 unzip -q "$OUT_ZIP" -d "$WORKDIR"
 
 # Di chuyển phiên bản cũ (nếu có) để sao lưu
 if [ -d "$DEST_DIR" ]; then
-    echo "=> Đang sao lưu phiên bản cũ..."
+    echo "=> Dang sao luu phien ban cu..."
     mv "$DEST_DIR" "$DEST_DIR.bak"
 fi
 
 # Di chuyển phiên bản mới vào vị trí
-echo "=> Đang cài đặt phiên bản mới..."
+echo "=> Dang cai dat phien ban moi..."
 mv "$WORKDIR/$EXTRACTED_DIR_NAME" "$DEST_DIR"
 
 # Cấp quyền thực thi
@@ -53,7 +54,7 @@ if [ -d "$DEST_DIR/cgi-bin" ]; then
 fi
 
 # 4. Cấu hình Web Server
-echo "=> Đang cấu hình web server (uhttpd)..."
+echo "=> Dang cau hinh web server (uhttpd)..."
 # Sao lưu file config gốc một lần
 if [ ! -f "$UHTTPD_CONF.bak-vwrt" ]; then
     cp "$UHTTPD_CONF" "$UHTTPD_CONF.bak-vwrt"
@@ -67,23 +68,22 @@ if ! grep -q "list index_page 'vwrt/index.html'" "$UHTTPD_CONF"; then
     sed -i "/config uhttpd 'main'/a\\
 	list index_page 'vwrt/index.html'" "$UHTTPD_CONF"
 fi
-
 if ! grep -q "list interpreter '.lua=/usr/bin/lua'" "$UHTTPD_CONF"; then
     sed -i "/config uhttpd 'main'/a\\
 	list interpreter '.lua=/usr/bin/lua'" "$UHTTPD_CONF"
 fi
 
 # 5. Hoàn tất
-echo "=> Đang khởi động lại web server..."
+echo "=> Dang khoi dong lai web server..."
 /etc/init.d/uhttpd restart
 
 # Dọn dẹp file sao lưu và file tạm
-echo "=> Đang dọn dẹp..."
+echo "=> Dang don dep..."
 rm -rf "$DEST_DIR.bak"
 rm -f "$OUT_ZIP"
 rm -rf "$WORKDIR"
 
-echo "✅ HOÀN TẤT! VWRT Dashboard đã được cài đặt thành công."
-echo "   Hãy truy cập địa chỉ IP của router để xem."
+echo "✅ HOAN TAT! VWRT Dashboard da duoc cai dat thanh cong."
+echo "   Hay truy cap dia chi IP cua router de xem."
 
 exit 0
