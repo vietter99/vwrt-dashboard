@@ -22,13 +22,13 @@
 ## 📋 Yêu cầu
 
 * Một router đang chạy **OpenWrt** đã được cài đặt giao diện web **LuCI**.
-🔑 Truy cập
+* 🔑 Truy cập
 Sau khi cài đặt, dashboard sẽ được thiết lập như sau:
 
 VWRT Dashboard (Mặc định):
 Truy cập thẳng vào địa chỉ IP của router để xem dashboard mới.
 
-[http://192.168.1.1](http://192.168.1.1/vwrt)
+http://routerip/vwrt/
 ---
 
 ## 🚀 Cài đặt nhanh (Một dòng lệnh)
