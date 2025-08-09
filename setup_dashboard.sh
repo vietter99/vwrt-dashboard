@@ -41,6 +41,18 @@ for pkg in $PACKAGES_NEEDED; do
     fi
 done
 
+# --- Bước 2: So sánh phiên bản ---
+LOCAL_VER=$(cat "$DEST/VERSION" 2>/dev/null || echo "0.0.0")
+LATEST_VER=$(curl -s -f "$VERSION_URL" 2>/dev/null)
+
+if [ -z "$LATEST_VER" ]; then
+    json_exit "error" "Không thể lấy thông tin phiên bản mới nhất từ GitHub."
+fi
+
+if [ "$LOCAL_VER" = "$LATEST_VER" ]; then
+    json_exit "skip" "Bạn đang ở phiên bản mới nhất!" "\"version\":\"$LOCAL_VER\""
+fi
+
 # --- Bước 3: Tải và kiểm tra file ---
 rm -rf "$OUT_ZIP" "$WORKDIR"
 mkdir -p "$WORKDIR"
@@ -54,12 +66,42 @@ if ! unzip -tq "$OUT_ZIP" >/dev/null 2>&1; then
     rm -f "$OUT_ZIP"
     json_exit "error" "File tải về không phải là file zip hợp lệ."
 fi
-# --- Bước 5: Cấu hình và dọn dẹp ---
-BACKEND_SCRIPT="$DEST/cgi-bin/backend.lua"
-if [ -f "$BACKEND_SCRIPT" ]; then
-    chmod +x "$BACKEND_SCRIPT"
+
+# --- Bước 4: Cập nhật an toàn (Giải nén và di chuyển) ---
+unzip -q "$OUT_ZIP" -d "$WORKDIR"
+EXTRACTED_DIR="$WORKDIR/$REPO_NAME-$BRANCH"
+
+if [ ! -d "$EXTRACTED_DIR" ]; then
+    rm -rf "$OUT_ZIP" "$WORKDIR"
+    json_exit "error" "Lỗi giải nén: không tìm thấy thư mục dự án."
 fi
 
+# Di chuyển thư mục cài đặt cũ (nếu có) sang backup
+if [ -d "$DEST" ]; then
+    mv "$DEST" "$DEST.bak"
+fi
+
+# Di chuyển phiên bản mới vào vị trí chính thức
+mv "$EXTRACTED_DIR" "$DEST"
+
+# Kiểm tra lại, nếu thành công thì xóa backup
+if [ -d "$DEST" ]; then
+    rm -rf "$DEST.bak"
+else
+    # Nếu thất bại, khôi phục lại từ backup
+    if [ -d "$DEST.bak" ]; then
+        mv "$DEST.bak" "$DEST"
+    fi
+    json_exit "error" "Không thể di chuyển phiên bản mới vào vị trí."
+fi
+
+# --- Bước 5: Cấu hình và dọn dẹp ---
+# Cấp quyền thực thi cho các script backend
+if [ -d "$DEST/cgi-bin" ]; then
+    chmod -R 755 "$DEST/cgi-bin"
+fi
+
+# Dọn dẹp file tạm
 rm -f "$OUT_ZIP"
 rm -rf "$WORKDIR"
 
@@ -90,4 +132,4 @@ if [ "$CONFIG_CHANGED" -eq 1 ]; then
 fi
 
 # --- Bước 6: Trả kết quả thành công ---
-json_exit "ok" "Cập nhật thành công!" "\"old_ver\":\"$LOCAL
+json_exit "ok" "Cập nhật thành công!" "\"old_ver\":\"$LOCAL_VER\",\"new_ver\":\"$LATEST_VER\""
