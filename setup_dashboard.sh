@@ -1,7 +1,6 @@
 #!/bin/sh
 
 # Hàm xuất JSON và thoát khỏi script
-# Usage: json_exit "status" "message" "optional_data"
 json_exit() {
     local status="$1"
     local msg="$2"
@@ -76,19 +75,15 @@ if [ ! -d "$EXTRACTED_DIR" ]; then
     json_exit "error" "Lỗi giải nén: không tìm thấy thư mục dự án."
 fi
 
-# Di chuyển thư mục cài đặt cũ (nếu có) sang backup
 if [ -d "$DEST" ]; then
     mv "$DEST" "$DEST.bak"
 fi
 
-# Di chuyển phiên bản mới vào vị trí chính thức
 mv "$EXTRACTED_DIR" "$DEST"
 
-# Kiểm tra lại, nếu thành công thì xóa backup
 if [ -d "$DEST" ]; then
     rm -rf "$DEST.bak"
 else
-    # Nếu thất bại, khôi phục lại từ backup
     if [ -d "$DEST.bak" ]; then
         mv "$DEST.bak" "$DEST"
     fi
@@ -96,37 +91,29 @@ else
 fi
 
 # --- Bước 5: Cấu hình và dọn dẹp ---
-# Cấp quyền thực thi cho các script backend
 if [ -d "$DEST/cgi-bin" ]; then
     chmod -R 755 "$DEST/cgi-bin"
 fi
 
-# Dọn dẹp file tạm
 rm -f "$OUT_ZIP"
 rm -rf "$WORKDIR"
 
-# Cấu hình uhttpd để dashboard làm trang chủ mặc định
 UHTTPD_CONF="/etc/config/uhttpd"
 CONFIG_CHANGED=0
 
-# Thêm trang index mới nếu chưa có
 if ! grep -q "list index_page 'vwrt/index.html'" "$UHTTPD_CONF"; then
     CONFIG_CHANGED=1
-    # Vô hiệu hóa trang mặc định cũ
     sed -i "s/.*list index_page 'index.html'.*/#&/" "$UHTTPD_CONF"
-    # Thêm vào cuối mục config uhttpd 'main'
     sed -i "/config uhttpd 'main'/a\\
 	list index_page 'vwrt/index.html'" "$UHTTPD_CONF"
 fi
 
-# Thêm trình thông dịch cho file .lua nếu chưa có
 if ! grep -q "list interpreter '.lua=/usr/bin/lua'" "$UHTTPD_CONF"; then
     CONFIG_CHANGED=1
     sed -i "/config uhttpd 'main'/a\\
 	list interpreter '.lua=/usr/bin/lua'" "$UHTTPD_CONF"
 fi
 
-# Khởi động lại uhttpd chỉ khi có thay đổi config
 if [ "$CONFIG_CHANGED" -eq 1 ]; then
     /etc/init.d/uhttpd restart
 fi
