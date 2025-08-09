@@ -1,5 +1,5 @@
 #!/bin/sh
-
+# --- Các biến cấu hình ---
 REPO_URL="https://github.com/vietter99/vwrt-dashboard.git"
 DEST_DIR="/www/vwrt"
 UHTTPD_CONF="/etc/config/uhttpd"
