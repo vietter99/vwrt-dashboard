@@ -66,7 +66,7 @@ rm -rf "$DEST_DIR.bak"
 rm -f "$OUT_ZIP"
 rm -rf "$WORKDIR"
 
-echo "✅ HOAN TAT! VWRT Dashboard da duoc cai dat thanh cong."
-echo "   Hay truy cap dia chi IP cua router de xem."
+echo "HOAN TAT! VWRT Dashboard da duoc cai dat thanh cong."
+echo "   Hay truy cap dia chi IP cua router-ip/vwrt de xem."
 
 exit 0
