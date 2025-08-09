@@ -2,7 +2,8 @@
 
 > Một dashboard giao diện hiện đại, gọn gàng và thời gian thực để theo dõi toàn bộ thông tin quan trọng trên router OpenWrt của bạn.
 
-![VWRT Dashboard Screenshot](https-tới-ảnh-chụp-màn-hình-của-bạn)
+![VWRT Dashboard Screenshot]<img width="826" height="913" alt="image" src="https://github.com/user-attachments/assets/2f514015-54e6-4581-99ac-673bc2e56a9d" />
+
 
 ---
 
