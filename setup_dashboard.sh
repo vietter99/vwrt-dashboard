@@ -4,13 +4,6 @@ REPO_URL="https://github.com/vietter99/vwrt-dashboard.git"
 DEST_DIR="/www/vwrt"
 UHTTPD_CONF="/etc/config/uhttpd"
 
-opkg update
-opkg install git wget
-
-if ! command -v git > /dev/null; then
-    exit 1
-fi
-
 rm -rf "$DEST_DIR"
 git clone "$REPO_URL" "$DEST_DIR"
 
