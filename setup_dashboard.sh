@@ -16,25 +16,16 @@ EXTRACTED_DIR_NAME="vwrt-dashboard-main"
 
 # --- Bắt đầu ---
 
-# 1. Cài đặt các gói phụ thuộc
-echo "=> Dang cai dat cac goi can thiet (wget, unzip)..."
-opkg update
-opkg install wget unzip
-
-# 2. Tải về phiên bản mới nhất
 echo "=> Dang tai phien ban moi nhat tu GitHub..."
 # Dọn dẹp file tạm cũ
 rm -rf "$OUT_ZIP" "$WORKDIR"
 mkdir -p "$WORKDIR"
 
-# Tải file zip
 wget -O "$OUT_ZIP" "$REPO_URL"
 
-# Kiểm tra file zip
 echo "=> Dang kiem tra file da tai ve..."
 unzip -tq "$OUT_ZIP"
 
-# 3. Cài đặt an toàn
 echo "=> Dang giai nen phien ban moi..."
 unzip -q "$OUT_ZIP" -d "$WORKDIR"
 
@@ -44,26 +35,20 @@ if [ -d "$DEST_DIR" ]; then
     mv "$DEST_DIR" "$DEST_DIR.bak"
 fi
 
-# Di chuyển phiên bản mới vào vị trí
 echo "=> Dang cai dat phien ban moi..."
 mv "$WORKDIR/$EXTRACTED_DIR_NAME" "$DEST_DIR"
 
-# Cấp quyền thực thi
 if [ -d "$DEST_DIR/cgi-bin" ]; then
     chmod -R 755 "$DEST_DIR/cgi-bin"
 fi
 
-# 4. Cấu hình Web Server
 echo "=> Dang cau hinh web server (uhttpd)..."
-# Sao lưu file config gốc một lần
 if [ ! -f "$UHTTPD_CONF.bak-vwrt" ]; then
     cp "$UHTTPD_CONF" "$UHTTPD_CONF.bak-vwrt"
 fi
 
-# Vô hiệu hóa trang index cũ
 sed -i "s/.*list index_page 'index.html'.*/#&/" "$UHTTPD_CONF"
 
-# Thêm cấu hình mới nếu chưa có
 if ! grep -q "list index_page 'vwrt/index.html'" "$UHTTPD_CONF"; then
     sed -i "/config uhttpd 'main'/a\\
 	list index_page 'vwrt/index.html'" "$UHTTPD_CONF"
@@ -73,11 +58,9 @@ if ! grep -q "list interpreter '.lua=/usr/bin/lua'" "$UHTTPD_CONF"; then
 	list interpreter '.lua=/usr/bin/lua'" "$UHTTPD_CONF"
 fi
 
-# 5. Hoàn tất
 echo "=> Dang khoi dong lai web server..."
 /etc/init.d/uhttpd restart
 
-# Dọn dẹp file sao lưu và file tạm
 echo "=> Dang don dep..."
 rm -rf "$DEST_DIR.bak"
 rm -f "$OUT_ZIP"
