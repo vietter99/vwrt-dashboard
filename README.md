@@ -25,8 +25,7 @@
 
 ## 🔑 Truy cập
 
-* Sau khi cài đặt, dashboard sẽ được thiết lập như sau:
-VWRT Dashboard (Mặc định):
+* Sau khi cài đặt, VWRT Dashboard (Mặc định) sẽ được thiết lập như sau:
 http://router-ip/vwrt
 ---
 
