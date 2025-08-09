@@ -34,4 +34,4 @@ http://router-ip/vwrt
 Chỉ cần kết nối vào router của bạn qua SSH và chạy một dòng lệnh duy nhất dưới đây. Script sẽ tự động cài đặt mọi thứ cần thiết.
 
 ```sh
-wget -O setup.sh [https://raw.githubusercontent.com/vietter99/vwrt-dashboard/main/setup_dashboard.sh](https://raw.githubusercontent.com/vietter99/vwrt-dashboard/main/setup_dashboard.sh) && chmod +x setup.sh && ./setup.sh
+wget -O setup.sh https://raw.githubusercontent.com/vietter99/vwrt-dashboard/main/setup_dashboard.sh && chmod +x setup.sh && ./setup.sh
