@@ -1,0 +1,129 @@
+/* --- BIẾN MÀU VÀ THIẾT LẬP CHUNG (CHỦ ĐỀ VÀNG & ĐEN) --- */
+:root {
+    --bg-color: #121212; /* Nền đen/xám rất đậm */
+    --card-bg-color: #1E1E1E; /* Nền card xám đậm */
+    --text-primary: #E0E0E0; /* Chữ chính màu xám nhạt */
+    --text-secondary: #888888; /* Chữ phụ màu xám vừa */
+    --border-color: #333333; /* Viền màu xám đậm */
+    --accent-yellow: #FFD700; /* Màu vàng gold làm điểm nhấn */
+    --accent-blue: #FFD700; /* Thay màu xanh bằng vàng */
+    --accent-green: #FFA500; /* Thay màu xanh lá bằng cam */
+    --accent-red: #DC143C; /* Màu đỏ sẫm */
+    --accent-purple: #FF8C00; /* Thay màu tím bằng cam đậm */
+    --code-bg: #252525; /* Nền cho các khối mã */
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { height: 100%; }
+body { 
+    font-family: 'Inter', sans-serif; 
+    background-color: var(--bg-color); 
+    color: var(--text-primary); 
+    line-height: 1.6; 
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+.container { 
+    max-width: 1280px; 
+    margin: 0 auto; 
+    padding: 2rem;
+    flex-grow: 1;
+}
+.dashboard-header { margin-bottom: 2rem; }
+.dashboard-header h1 { font-size: 2.25rem; font-weight: 700; }
+.dashboard-header p { color: var(--text-secondary); margin-top: 0.25rem; }
+.main-grid { display: grid; gap: 1.5rem; grid-template-columns: 1fr; }
+.card { 
+    background-color: var(--card-bg-color); 
+    border-radius: 0.75rem; 
+    border: 1px solid var(--border-color); /* Thêm viền cho card trên nền tối */
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); 
+    padding: 1.5rem; 
+    transition: all 0.3s ease; 
+}
+.card:hover { 
+    transform: translateY(-5px); 
+    border-color: var(--accent-yellow);
+}
+.card-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem; }
+
+.card-stretch {
+    display: flex;
+    flex-direction: column;
+}
+
+.info-grid { display: flex; flex-direction: column; gap: 0.75rem; }
+.info-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem; }
+.info-label { font-weight: 500; color: var(--text-secondary); }
+.info-value { font-family: monospace; background-color: var(--code-bg); padding: 0.25rem 0.5rem; border-radius: 0.25rem; transition: background-color 0.3s, color 0.3s; }
+.progress-block { margin-bottom: 1rem; }
+.progress-bar { background-color: var(--border-color); border-radius: 9999px; height: 0.75rem; overflow: hidden; margin-top: 0.25rem; }
+.progress-bar-inner { height: 100%; border-radius: 9999px; transition: width 0.5s ease-in-out; }
+.cpu-bar { background-color: var(--accent-blue); }
+.ram-bar { background-color: var(--accent-green); }
+.rom-bar { background-color: var(--accent-purple); }
+.usage-details { font-size: 0.75rem; color: var(--text-secondary); text-align: right; margin-top: 0.25rem; }
+.chart-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; }
+.speed-info { display: flex; gap: 1rem; font-size: 0.875rem; }
+.speed-item { display: flex; align-items: center; }
+.speed-dot { width: 0.75rem; height: 0.75rem; border-radius: 50%; margin-right: 0.5rem; }
+.dot-down { background-color: var(--accent-red); }
+.dot-up { background-color: var(--accent-blue); }
+.small-chart-container { height: 10rem; }
+.table-container { overflow-x: auto; }
+.client-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+.client-table th, .client-table td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--border-color); }
+.client-table th { font-weight: 600; color: var(--text-secondary); }
+.client-table td .ip-mac { font-family: monospace; }
+.wifi-info-container { display: flex; flex-direction: column; gap: 1.5rem; }
+
+.ip-public {
+    background-color: var(--accent-yellow) !important;
+    color: #121212; /* Chữ màu đen để tương phản với nền vàng */
+    font-weight: 600;
+}
+
+/* Speedtest Styles */
+.speedtest-container { text-align: center; }
+#speedtest-btn { padding: 0.75rem 1.5rem; border: none; border-radius: 9999px; background-color: var(--accent-yellow); color: #121212; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; margin-bottom: 1.5rem; }
+#speedtest-btn:hover { background-color: #FFEC8B; }
+#speedtest-btn:disabled { background-color: #555; color: #888; cursor: not-allowed; }
+.speedtest-results { display: flex; justify-content: space-around; }
+.result-item { display: flex; flex-direction: column; align-items: center; }
+.result-label { color: var(--text-secondary); font-size: 0.875rem; }
+.result-value { font-size: 1.25rem; font-weight: 600; }
+
+/* Footer Styles */
+.dashboard-footer {
+    text-align: center;
+    padding: 1.5rem;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin-top: 2rem;
+}
+
+/* *** THÊM MỚI: Định dạng cho link ở footer *** */
+.dashboard-footer .footer-link {
+    color: var(--accent-yellow);
+    text-decoration: none;
+    transition: text-decoration 0.2s;
+}
+
+.dashboard-footer .footer-link:hover {
+    text-decoration: underline;
+}
+
+/* Responsive Grid Layout */
+@media (min-width: 768px) {
+    .main-grid { grid-template-columns: repeat(4, 1fr); }
+    .md-span-2 { grid-column: span 2 / span 2; }
+    .md-span-4 { grid-column: span 4 / span 4; }
+    .wifi-info-container { flex-direction: row; }
+}
+@media (min-width: 1024px) {
+    .main-grid { grid-template-columns: repeat(6, 1fr); }
+    .lg-span-2 { grid-column: span 2 / span 2; }
+    .lg-span-3 { grid-column: span 3 / span 3; }
+    .lg-span-6 { grid-column: span 6 / span 6; }
+}

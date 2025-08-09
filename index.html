@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VWRT Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="container">
+        <header class="dashboard-header">
+            <h1>VWRT Dashboard</h1>
+            <p>Trạng thái router của bạn trong nháy mắt</p>
+        </header>
+
+        <div class="main-grid">
+            
+            <!-- Card: Thông tin hệ thống -->
+            <div class="card md-span-4 lg-span-2">
+                <h2 class="card-title">Thông tin hệ thống</h2>
+                <div class="info-grid">
+                    <div class="info-row"><span class="info-label">Hostname</span><span id="hostname" class="info-value">...</span></div>
+                    <div class="info-row"><span class="info-label">Model</span><span id="model" class="info-value">...</span></div>
+                    <div class="info-row"><span class="info-label">Firmware</span><span id="firmware" class="info-value">...</span></div>
+                    <div class="info-row"><span class="info-label">Target Platform</span><span id="target-platform" class="info-value">...</span></div>
+                    <div class="info-row"><span class="info-label">Kernel Version</span><span id="kernel-version" class="info-value">...</span></div>
+                    <div class="info-row"><span class="info-label">Thời gian hoạt động</span><span id="uptime" class="info-value">...</span></div>
+                </div>
+            </div>
+
+            <!-- Card: CPU, RAM & ROM -->
+            <div class="card md-span-2 lg-span-2">
+                <h2 class="card-title">CPU, RAM & ROM</h2>
+                <div class="progress-block">
+                    <div class="info-row"><span class="info-label">Sử dụng CPU</span><span id="cpu-usage-text" style="font-family: monospace;">...%</span></div>
+                    <div class="progress-bar"><div id="cpu-usage-bar" class="progress-bar-inner cpu-bar"></div></div>
+                </div>
+                <div class="progress-block">
+                    <div class="info-row"><span class="info-label">Sử dụng RAM</span><span id="ram-usage-text" style="font-family: monospace;">...%</span></div>
+                    <div class="progress-bar"><div id="ram-usage-bar" class="progress-bar-inner ram-bar"></div></div>
+                    <div id="ram-details" class="usage-details">.../...</div>
+                </div>
+                <div class="progress-block">
+                    <div class="info-row"><span class="info-label">Sử dụng ROM</span><span id="rom-usage-text" style="font-family: monospace;">...%</span></div>
+                    <div class="progress-bar"><div id="rom-usage-bar" class="progress-bar-inner rom-bar"></div></div>
+                    <div id="rom-details" class="usage-details">.../...</div>
+                </div>
+            </div>
+
+            <!-- Card: Thông tin WAN -->
+            <div class="card md-span-2 lg-span-2">
+                <h2 class="card-title">Thông tin WAN</h2>
+                <div class="info-grid">
+                    <div class="info-row">
+                        <span class="info-label">IP Public</span>
+                        <span id="public-ip" class="info-value ip-public">...</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Nhà cung cấp</span>
+                        <span id="public-isp" class="info-value">...</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Ping</span>
+                        <span id="wan-ping" class="info-value">...</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Tổng tải xuống</span>
+                        <span id="wan-total-down" class="info-value">...</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Tổng tải lên</span>
+                        <span id="wan-total-up" class="info-value">...</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Tổng dung lượng</span>
+                        <span id="wan-total-usage" class="info-value">...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Các card còn lại -->
+            <div class="card md-span-2 lg-span-3">
+                 <div class="chart-header">
+                    <h2 class="card-title" style="margin-bottom: 0;">Lưu lượng mạng (WAN)</h2>
+                    <div class="speed-info">
+                        <div class="speed-item"><span class="speed-dot dot-down"></span><span>Tải xuống: <b id="speed-down">...</b></span></div>
+                        <div class="speed-item"><span class="speed-dot dot-up"></span><span>Tải lên: <b id="speed-up">...</b></span></div>
+                    </div>
+                </div>
+                <div class="small-chart-container">
+                    <canvas id="trafficChart"></canvas>
+                </div>
+            </div>
+            <div class="card md-span-2 lg-span-3">
+                <div class="chart-header">
+                    <h2 class="card-title" style="margin-bottom: 0;">Độ trễ mạng (Ping)</h2>
+                    <div class="speed-info">
+                        <div class="speed-item"><span class="speed-dot" style="background-color: var(--accent-purple);"></span><span>Hiện tại: <b id="ping-latency">...</b></span></div>
+                    </div>
+                </div>
+                <div class="small-chart-container">
+                    <canvas id="latencyChart"></canvas>
+                </div>
+            </div>
+            <div class="card md-span-4 lg-span-6">
+                <h2 class="card-title">Thông tin Wi-Fi</h2>
+                <div class="wifi-info-container">
+                    <div id="wifi-2.4ghz" class="info-grid" style="flex: 1;">
+                        <h3 class="card-title" style="font-size: 1.1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">Băng tần 2.4 GHz</h3>
+                        <div class="info-row"><span class="info-label">SSID</span><span id="wifi-24-ssid" class="info-value">...</span></div>
+                        <div class="info-row"><span class="info-label">Kênh</span><span id="wifi-24-channel" class="info-value">...</span></div>
+                        <div class="info-row"><span class="info-label">Số client</span><span id="wifi-24-clients" class="info-value">...</span></div>
+                    </div>
+                    <div id="wifi-5ghz" class="info-grid" style="flex: 1;">
+                        <h3 class="card-title" style="font-size: 1.1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">Băng tần 5 GHz</h3>
+                        <div class="info-row"><span class="info-label">SSID</span><span id="wifi-5-ssid" class="info-value">...</span></div>
+                        <div class="info-row"><span class="info-label">Kênh</span><span id="wifi-5-channel" class="info-value">...</span></div>
+                        <div class="info-row"><span class="info-label">Số client</span><span id="wifi-5-clients" class="info-value">...</span></div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card: Danh sách thiết bị kết nối (ĐÃ CẬP NHẬT) -->
+            <div class="card md-span-4 lg-span-6">
+                <h2 class="card-title">Danh sách thiết bị kết nối</h2>
+                <div class="table-container">
+                    <table class="client-table">
+                        <thead>
+                            <tr>
+                                <th>Hostname</th>
+                                <th>Địa chỉ IP</th>
+                                <th>Địa chỉ MAC</th>
+                                <th>Kết nối</th>
+                                <th>Tải xuống (RX)</th>
+                                <th>Tải lên (TX)</th>
+                                <th>Tổng</th>
+                            </tr>
+                        </thead>
+                        <tbody id="client-list-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer class="dashboard-footer">
+        <p>VWRT - © 2025 | <a href="https://www.facebook.com/" target="_blank" class="footer-link">Facebook</a></p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
