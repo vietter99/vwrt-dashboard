@@ -2,8 +2,7 @@
 
 > Một dashboard giao diện hiện đại, gọn gàng và thời gian thực để theo dõi toàn bộ thông tin quan trọng trên router OpenWrt của bạn.
 
-![VWRT Dashboard Screenshot]<img width="826" height="913" alt="image" src="https://github.com/user-attachments/assets/2f514015-54e6-4581-99ac-673bc2e56a9d" />
-
+![VWRT Dashboard Screenshot](<img width="826" height="913" alt="image" src="https://github.com/user-attachments/assets/d1ad3cfb-e225-454c-ab02-7b99239927c4" />)
 
 ---
 
@@ -31,3 +30,15 @@ Chỉ cần kết nối vào router của bạn qua SSH và chạy một dòng l
 
 ```sh
 wget -O setup.sh [https://raw.githubusercontent.com/vietter99/vwrt-dashboard/main/setup_dashboard.sh](https://raw.githubusercontent.com/vietter99/vwrt-dashboard/main/setup_dashboard.sh) && chmod +x setup.sh && ./setup.sh
+
+🔑 Truy cập
+Sau khi cài đặt, dashboard sẽ được thiết lập như sau:
+
+VWRT Dashboard (Mặc định):
+Truy cập thẳng vào địa chỉ IP của router để xem dashboard mới.
+
+[http://192.168.1.1](http://192.168.1.1)
+Giao diện LuCI gốc:
+Để vào trang quản trị LuCI cũ, bạn hãy dùng đường dẫn /cgi-bin/luci.
+
+[http://192.168.1.1/cgi-bin/luci](http://192.168.1.1/cgi-bin/luci)
