@@ -23,6 +23,11 @@
 
 * Một router đang chạy **OpenWrt** đã được cài đặt giao diện web **LuCI**.
 
+## 🔑 Truy cập
+
+* Sau khi cài đặt, dashboard sẽ được thiết lập như sau:
+VWRT Dashboard (Mặc định):
+http://router-ip/vwrt
 ---
 
 ## 🚀 Cài đặt nhanh (Một dòng lệnh)
@@ -31,11 +36,3 @@ Chỉ cần kết nối vào router của bạn qua SSH và chạy một dòng l
 
 ```sh
 wget -O setup.sh [https://raw.githubusercontent.com/vietter99/vwrt-dashboard/main/setup_dashboard.sh](https://raw.githubusercontent.com/vietter99/vwrt-dashboard/main/setup_dashboard.sh) && chmod +x setup.sh && ./setup.sh
-
----
-
-## 🔑 Truy cập
-
-* Sau khi cài đặt, dashboard sẽ được thiết lập như sau:
-VWRT Dashboard (Mặc định):
-http://router-ip/vwrt
